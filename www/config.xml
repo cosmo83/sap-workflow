@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.phonegap.hello-world" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
-    <name>SAT</name>
+<widget id="com.sat-infotech.sapwf"version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+    <name>SAP Workflow</name>
     <description>
-	SAP Purchase Order Approval
+	SAP Workflow Mechanism
     </description>
     <author email="arava@sat-infotech.com" href="http://www.sat-infotech.com">
         Phani Arava
