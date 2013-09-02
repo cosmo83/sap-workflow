@@ -98,6 +98,10 @@
     				  }
 				  });	
 			}
+			function refresh(){
+				$('#workList').empty();
+				fillList();
+			}
 
         </script>
         <script type="text/javascript" charset="utf-8">
@@ -117,7 +121,7 @@
 <div data-role="page" data-theme="e">
 
 	<div data-role="header" data-theme="d">
-   	<a href="#back" data-role="button" data-rel="back" data-icon="arrow-l" data-iconpos="notext" data-inline="true" data-transition="fade">Back</a>
+        <a href="#" data-role="button" data-icon="refresh" data-iconpos="notext" data-inline="true" class="ui-btn-right" onClick="refresh()">Refresh</a>
         <a href="settings.html" data-role="button" data-icon="gear" data-iconpos="notext" data-inline="true" class="ui-btn-right" data-transition="fade">Settings</a>
    	<h2>Work List Items</h2> 
 	</div><!-- /header -->
