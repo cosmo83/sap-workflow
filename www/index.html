@@ -108,6 +108,14 @@
                                 fillList();
 				$(document).ready("#button").click(function() {  });
                         }
+			$(document).on({
+  				ajaxStart: function() { 
+				        $.mobile.loading('show');
+				},
+				ajaxStop: function() {
+    					$.mobile.loading('hide');
+  				}    
+			});
        </script>
 
 
