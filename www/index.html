@@ -63,12 +63,15 @@
 						var subject = data.results[i].subject;
 						var task_name = data.results[i].task_name 
 						if(subject.indexOf("PO RAISED") < 0){
-						$('#workList').append('<div class="workDetails" data-role="collapsible"><h3>'+value+'</h3><p>'+subject+'</p><p>'+task_name+'</p><p><a data-role="button" data-inline="true" data-theme="a" data-icon="delete" data-mini="true" id="reject-button-'+value+'" onClick=\'decideObject("'+value+'","'+scheme_id+'","'+scheme_agency_id+'","0002")\'>Reject</a><a data-role="button" data-icon="check" data-inline="true" data-mini="true" data-theme="b" id="accept-button-'+value+'" onClick=\'decideObject("'+value+'","'+scheme_id+'","'+scheme_agency_id+'","0001")\'>Approve</a><a data-role="button" data-icon="check" data-inline="true" data-mini="true" data-theme="b" onClick=\'moreDetails("'+value+'","'+scheme_id+'","'+scheme_agency_id+'")\'>More Details</a></p></div>');
+						$('#workList').append('<div class="workDetails" data-role="collapsible"><h3>'+value+'</h3><p>'+subject+'</p><p>'+task_name+'</p><p><a data-role="button" data-inline="true" data-theme="a" data-icon="delete" data-mini="true" id="reject-button-'+value+'" onClick=\'decideObject("'+value+'","'+scheme_id+'","'+scheme_agency_id+'","0002")\'>Reject</a><a data-role="button" data-icon="check" data-inline="true" data-mini="true" data-theme="b" id="accept-button-'+value+'" onClick=\'decideObject("'+value+'","'+scheme_id+'","'+scheme_agency_id+'","0001")\'>Approve</a><a data-role="button" data-icon="check" data-inline="true" data-mini="true" id="more-button-'+value+'" data-theme="b" onClick=\'moreDetails("'+value+'","'+scheme_id+'","'+scheme_agency_id+'")\'>More Details</a></p></div>');
 						var button_reject = "#reject-button-"+value;
 						var button_accept = "#accept-button-"+value;
+						var button_more = "#more-button-"+value;
 						$('#workList').collapsibleset("refresh");
 						$(button_reject).buttonMarkup();
 						$(button_accept).buttonMarkup();
+						$(button_more).buttonMarkup();
+
 						j = j + 1;
 						}
 					}
@@ -106,11 +109,13 @@
 				  });	
 			}
 			function moreDetails(value,scheme_id,scheme_agency_id){
+				alert("1);
 				var myurl="http://nplhost.sat-infotech.com:8042/sap/opu/sdata/sap/wfdecisiontaskprocessing/";
 				var sUrl = myurl + "WorkflowTaskCollection(value='"+value+"',scheme_id='"+scheme_id+"',scheme_agency_id='"+scheme_agency_id+"')/ExtensibleElementsi";
 				var storage = localStorage;
                                 var strUsername=storage.getItem("username");
                                 var strPassword=storage.getItem("password");
+				alert("2");
 				$.ajax({
                                   url: sUrl,
                                   type: 'GET',
