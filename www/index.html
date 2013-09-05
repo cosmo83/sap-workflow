@@ -51,6 +51,7 @@
                                 }; 
                                 OData.read(request, 
                                 function (data) {
+					var j=0;
 					if(data.results.length==0){
 						$("p#loading-div").html("No Work Items");
 					}
@@ -68,8 +69,12 @@
 						$('#workList').collapsibleset("refresh");
 						$(button_reject).buttonMarkup();
 						$(button_accept).buttonMarkup();
+						j = j + 1;
 						}
 					}
+					}
+					(if j==0){
+						$("p#loading-div").html("No Work Items");
 					}
                                 }, function (err) {
                                         alert(JSON.stringify(err));
