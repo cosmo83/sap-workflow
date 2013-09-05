@@ -61,7 +61,7 @@
 						var scheme_agency_id = data.results[i].scheme_agency_id;	
 						var subject = data.results[i].subject;
 						var task_name = data.results[i].task_name 
-						if(task_name.indexOf("PO RAISED") < 0){
+						if(subject.indexOf("PO RAISED") < 0){
 						$('#workList').append('<div class="workDetails" data-role="collapsible"><h3>'+value+'</h3><p>'+subject+'</p><p>'+task_name+'</p><p><a data-role="button" data-inline="true" data-theme="a" data-icon="delete" data-mini="true" id="reject-button-'+value+'" onClick=\'decideObject("'+value+'","'+scheme_id+'","'+scheme_agency_id+'","0002")\'>Reject</a><a data-role="button" data-icon="check" data-inline="true" data-mini="true" data-theme="b" id="accept-button-'+value+'" onClick=\'decideObject("'+value+'","'+scheme_id+'","'+scheme_agency_id+'","0001")\'>Approve</a></p></div>');
 						var button_reject = "#reject-button-"+value;
 						var button_accept = "#accept-button-"+value;
