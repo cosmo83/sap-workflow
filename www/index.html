@@ -17,159 +17,188 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<!DOCTYPE html> 
-<html> 
-<head> 
-	<title>Page Title</title> 
-	
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<link rel="stylesheet" href="css/jquery.mobile-1.3.2.min.css" />
-	<script src="phonegap.js"></script>
-	<script src="js/jquery-1.10.2.min.js"></script>
-	<script type="text/javascript" src="js/datajs-1.1.1.js"></script>                                                                                                   
-	<script src="js/jquery.mobile-1.3.2.min.js"></script>
-	<script type="text/javascript" charset="utf-8">
-			var storage = sessionStorage;
-			function add_item(value){
-				storage.clear();
-				storage.setItem("id",value);	
-				$.mobile.changePage("carr.html", { transition: "slide" });
-			}	
-                        function fillList(){
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <title>SAP Workflow POC</title>
+        <script src="js/jquery-1.10.2.min.js"></script>
+        <script src="js/jquery.mobile-1.3.2.min.js"></script>
+	<script>
+		$(document).on( "pageinit", "#main-page", function() {
+			var storage=sessionStorage;
+                        $.support.cors = true;
+                        $.mobile.allowCrossDomainPages = true;
+                        $('#username').val(localStorage.username);
+                        $('#password').val(localStorage.password);
+                });
+		$(document).on( "pageinit", "#zp1-page", function() {
+			getData();
+                });
+		function saveUser(){
+                                var storage=localStorage;
+                                storage.clear();
+                                storage.setItem("username",$('#username').val());
+                                storage.setItem("password",$('#password').val());
+                        }
+                function getUser(){
+                                var storage = localStorage;
+                                return storage.getItem("username");
+                        }
+                function getPass(){
+                                var storage = localStorage;
+                                return storage.getItem("password");
+                        }
+		function sayHi(name,scheme_id,scheme_agency_id){
+				var storage = sessionStorage;
+				storage.setItem("zp1item",name);
+				storage.setItem("scheme_id",scheme_id);
+				storage.setItem("scheme_agency_id",scheme_agency_id);
+				$.mobile.changePage( "zp1details.html", { transition: "slideup", changeHash: false });
+		}
+		function getData(){
+				$('#workList').empty();
+                                $("#footertext").html("Checking");
                                 OData.defaultHttpClient.enableJsonpCallback = false;
                                 var myurl="http://nplhost.sat-infotech.com:8042/sap/opu/sdata/sap/wfdecisiontaskprocessing/";
-				var storage = localStorage;
+                                var storage = localStorage;
                                 var strUsername=storage.getItem("username");
                                 var strPassword=storage.getItem("password");
                                 var sUrl = myurl+"WorkflowTaskCollection";
                                 var oHeaders = {};
-                                oHeaders['Authorization'] = "Basic " + btoa(strUsername + ":" + strPassword); 
-                                var request = { 
-                                        headers : oHeaders, // object that contains HTTP headers as name value pairs 
-                                        requestUri : sUrl, // OData endpoint URI 
+                                oHeaders['Authorization'] = "Basic " + btoa(strUsername + ":" + strPassword);
+                                var request = {
+                                        headers : oHeaders, // object that contains HTTP headers as name value pairs
+                                        requestUri : sUrl, // OData endpoint URI
                                         method : "GET"
-                                }; 
-                                OData.read(request, 
+                                };
+                                workItems=[];
+                                OData.read(request,
                                 function (data) {
-					var j=0;
-					if(data.results.length==0){
-						$("p#loading-div").html("No Work Items");
+                                        var j=0;
+                                        for (var i=0;i<data.results.length;i++){
+                                                var value = data.results[i].value;
+                                                var scheme_id = data.results[i].scheme_id;
+                                                var scheme_agency_id = data.results[i].scheme_agency_id;
+                                                var subject = data.results[i].subject;
+                                                var task_name = data.results[i].task_name
+						var created_by = data.results[i].created_by
+                                                if(subject.indexOf("PO RAISED") < 0){
+							j=j+1;
+							$('#workList').append('<li><a  onClick="sayHi(\''+value+'\',\''+scheme_id+'\',\''+scheme_agency_id+'\')"><h3>Work Item: '+value+'</h3><p>'+subject+'</p><p>'+task_name+'</p><p><p>Created By : '+created_by+'</p></a></li>');
+                                                }
+                                        }
+					if(j==0){
+						$('#noitemstext').html('<p>No Worklist Items</p>');
 					}
 					else{
-					for (var i=0;i<data.results.length;i++){
-						var value = data.results[i].value;
-						var scheme_id = data.results[i].scheme_id;
-						var scheme_agency_id = data.results[i].scheme_agency_id;	
-						var subject = data.results[i].subject;
-						var task_name = data.results[i].task_name 
-						if(subject.indexOf("PO RAISED") < 0){
-						$('#workList').append('<div class="workDetails" data-role="collapsible"><h3>'+value+'</h3><p>'+subject+'</p><p>'+task_name+'</p><p><a data-role="button" data-inline="true" data-theme="a" data-icon="delete" data-mini="true" id="reject-button-'+value+'" onClick=\'decideObject("'+value+'","'+scheme_id+'","'+scheme_agency_id+'","0002")\'>Reject</a><a data-role="button" data-icon="check" data-inline="true" data-mini="true" data-theme="b" id="accept-button-'+value+'" onClick=\'decideObject("'+value+'","'+scheme_id+'","'+scheme_agency_id+'","0001")\'>Approve</a><a data-role="button" data-icon="check" data-inline="true" data-mini="true" id="more-button-'+value+'" data-theme="b" onClick=\'moreDetails("'+value+'","'+scheme_id+'","'+scheme_agency_id+'")\'>More Details</a></p></div>');
-						var button_reject = "#reject-button-"+value;
-						var button_accept = "#accept-button-"+value;
-						var button_more = "#more-button-"+value;
-						$('#workList').collapsibleset("refresh");
-						$(button_reject).buttonMarkup();
-						$(button_accept).buttonMarkup();
-						$(button_more).buttonMarkup();
-
-						j = j + 1;
-						}
-					}
-					}
-					if (j==0){
-						$("p#loading-div").html("No Work Items f");
+                				$('#workList').listview("refresh");
 					}
                                 }, function (err) {
                                         alert(JSON.stringify(err));
 
                                 });
                         }
-			function decideObject(value,scheme_id,scheme_agency_id,dec_key){
-                                var myurl="http://nplhost.sat-infotech.com:8042/sap/opu/sdata/sap/wfdecisiontaskprocessing/";
-				var sUrl = myurl + "DecisionOption_ApplyDecision?value="+value+"&scheme_id="+scheme_id+"&scheme_agency_id="+scheme_agency_id+"&dec_key="+dec_key;
-				var storage = localStorage;
-                                var strUsername=storage.getItem("username");
-                                var strPassword=storage.getItem("password");
-				$.ajax({
-  				  url: sUrl,
-				  type: 'GET',
-				  username: strUsername,
-				  password: strPassword,
-				  error : function (request,error){ alert(JSON.stringify(request)); }, 
-				  success: function (data) {
-					if(dec_key=="0002"){
-						alert("Work Item Rejected");
-					}
-					if(dec_key=="0001"){
-						alert("Work Item Accepted");
-					}
-					$('#workList').empty();	
-					fillList();
-    				  }
-				  });	
-			}
-			function moreDetails(value,scheme_id,scheme_agency_id){
-				alert("1);
-				var myurl="http://nplhost.sat-infotech.com:8042/sap/opu/sdata/sap/wfdecisiontaskprocessing/";
-				var sUrl = myurl + "WorkflowTaskCollection(value='"+value+"',scheme_id='"+scheme_id+"',scheme_agency_id='"+scheme_agency_id+"')/ExtensibleElementsi";
-				var storage = localStorage;
-                                var strUsername=storage.getItem("username");
-                                var strPassword=storage.getItem("password");
-				alert("2");
-				$.ajax({
-                                  url: sUrl,
-                                  type: 'GET',
-                                  username: strUsername,
-                                  password: strPassword,
-                                  error : function (request,error){ alert(JSON.stringify(request)); },
-                                  success: function (data) {
-                                                alert(JSON.stringify(data));
-                                  }
-                                  });
 
-				
-			}
-
+	
+	</script>
+    </head>
+    <body>
+	<script type="javascript">
+	$(document).on( "pageinit", "#zp1-page", function() {
+			alert("hello");
+         });
         </script>
-        <script type="text/javascript" charset="utf-8">
-                        document.addEventListener("deviceready", onDeviceReady, false);
-                        function onDeviceReady() {
-				$.support.cors = true;
-			        $.mobile.allowCrossDomainPages = true;
-                                fillList();
-				$(document).ready("#button").click(function() {  });
-                        }
-			$(document).on({
-  				ajaxStart: function() { 
-				        $.mobile.loading('show');
-				},
-				ajaxStop: function() {
-    					$.mobile.loading('hide');
-  				}    
-			});
-       </script>
+	<div data-role="page" id="main-page">
 
-
-</head> 
-<body> 
-
-<div data-role="page" data-theme="e">
-
-	<div data-role="header" data-theme="d">
-        <a href="settings.html" data-role="button" data-icon="gear" data-iconpos="notext" data-inline="true" class="ui-btn-right" data-transition="fade">Settings</a>
-   	<h2>Work List Items</h2> 
+	<div data-role="header">
+		<h1>Home Page</h1>
+		<a href="#panel-nav" data-icon="bars" data-iconpos="notext">Navigation</a>
+		<a href="#settings" data-icon="gear" data-iconpos="notext">Navigation</a>
 	</div><!-- /header -->
 
 	<div data-role="content">	
-		<p id="loading-div"></p>		
-		<div data-role="collapsible-set" data-inset="true" data-filter="true" id="workList">
-		</div>
 	</div><!-- /content -->
-
-	<div data-role="footer">
-		<h4>SAT Infotech Pvt Ltd.</h4>
+	
+	<div data-role="footer" data-position="fixed" visible="false">
+		<small id="status">&nbsp;</small> 
 	</div><!-- /footer -->
-</div><!-- /page -->
+	<div data-role="panel" id="panel-nav" class="jqm-nav-panel" data-position="left"  data-display="overlay"  data-theme="c" data-position-fixed="true">
+	 <ul data-role="listview" data-inset="false" data-theme="d" data-divider-theme="d"  data-icon="false" class="jqm-list">
+            <li><a href="#main-page">Home</a></li>
+            <li><a href="#zp1-page">Workflow</a></li>
+        </ul>
+	</div><!-- /panel -->
+        <div data-role="panel" data-position="right" id="settings" data-theme="b" class="jqm-nav-panel">
 
-</body>
+        <form class="userform">
+            <h2>Save User Details</h2>
+            <label for="username">User Name</label>
+            <input type="text" name="username" id="username" data-mini="true">
+
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" autocomplete="off" data-mini="true">
+
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><a href="#" data-rel="close" data-role="button" data-theme="c" data-mini="true">Cancel</a></div>
+                <div class="ui-block-b"><a href="#" data-rel="close" data-role="button" data-theme="b" data-mini="true" onClick="saveUser()">Save</a></div>
+            </div>
+        </form>
+
+        </div><!-- /panel -->
+	
+	</div><!-- /page -->
+	<!--------------------------------------------------------------------------------------------------------------->
+        <div data-role="page" id="zp1-page">
+
+        <div data-role="header">
+                <h1>ZP1 Work Items</h1>
+                <a href="#panel-nav" data-icon="bars" data-iconpos="notext">Navigation</a>
+                <a href="#" data-icon="refresh" data-iconpos="notext" onClick="getData()">Refresh</a>
+        </div><!-- /header -->
+
+        <div data-role="content">
+		<span id="noitemstext">&nbsp;</span>
+		<div data-role="listview" data-inset="true" data-filter="true" id="workList">
+                </div>
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed">
+		<small>&nbsp;</small>
+        </div><!-- /footer -->
+        <div data-role="panel" id="panel-nav" class="jqm-nav-panel" data-position="left"  data-display="overlay"  data-theme="c" data-position-fixed="true">
+         <ul data-role="listview" data-inset="false" data-theme="d" data-divider-theme="d"  data-icon="false" class="jqm-list">
+            <li><a href="#main-page">Home</a></li>
+            <li><a href="#zp1-page">Workflow</a></li>
+        </ul>
+        </div><!-- /panel -->
+        <div data-role="panel" data-position="right" id="settings" data-theme="b" class="jqm-nav-panel">
+
+        <form class="userform">
+            <h2>Save User Details</h2>
+            <label for="username">User Name</label>
+            <input type="text" name="username" id="username" data-mini="true">
+
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" autocomplete="off" data-mini="true">
+
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><a href="#" data-rel="close" data-role="button" data-theme="c" data-mini="true">Cancel</a></div>
+                <div class="ui-block-b"><a href="#" data-rel="close" data-role="button" data-theme="b" data-mini="true" onClick="saveUser()">Save</a></div>
+            </div>
+        </form>
+
+        </div><!-- /panel -->
+
+
+        </div><!-- /page -->
+
+        <script type="text/javascript" src="phonegap.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+	<link rel="stylesheet"  href="css/jquery.mobile-1.3.2.min.css">
+        <script type="text/javascript" src="js/datajs-1.1.1.js"></script>
+
+
+    </body>
 </html>
