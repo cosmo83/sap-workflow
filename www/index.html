@@ -25,14 +25,56 @@
         <title>SAP Workflow POC</title>
         <script src="js/jquery-1.10.2.min.js"></script>
         <script src="js/jquery.mobile-1.3.2.min.js"></script>
+	<script src="js/highcharts.js"></script>
 	<script>
+		var materialcat;
 		$(document).on( "pageinit", "#main-page", function() {
 			var storage=sessionStorage;
                         $.support.cors = true;
                         $.mobile.allowCrossDomainPages = true;
                         $('#username').val(localStorage.username);
                         $('#password').val(localStorage.password);
+			fetchMaterials();
                 });
+		function drawChart(){
+			Highcharts.setOptions({
+			 colors: ['yellow', 'red', 'green', 'black']
+			});
+   		    $('#container').highcharts({
+       	     chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: true
+            },
+            title: {
+                text: 'Material Buffer Status'
+            },
+            tooltip: {
+        	    pointFormat: '{series.name}: <b>{point.y:.0f}</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+	       	showInLegend: true
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Number Of Materials',
+                data: [
+                    ['Adequate',   materialcat['yellow'].length],
+                    ['Risk',      materialcat['red'].length],
+                    ['High',    materialcat['green'].length],
+                    ['Black-Out',     materialcat['black'].length],
+                ]
+            	}]
+        	}); 
+
+		}
 		$(document).on( "pageinit", "#zp1-page", function() {
 			getData();
                 });
@@ -57,6 +99,52 @@
 				storage.setItem("scheme_agency_id",scheme_agency_id);
 				$.mobile.changePage( "zp1details.html", { transition: "slideup", changeHash: false });
 		}
+		function fetchMaterials(){
+			OData.defaultHttpClient.enableJsonpCallback = false;
+                        var myurl="http://nplhost.sat-infotech.com:8042/sap/opu/odata/sap/Z_BUFFER_TEST/";
+                        var storage = localStorage;
+                        var strUsername=storage.getItem("username");
+                        var strPassword=storage.getItem("password");
+			var sUrl = myurl+"BufferCollection";
+                        var oHeaders = {};
+                        oHeaders['Authorization'] = "Basic " + btoa(strUsername + ":" + strPassword);
+                        var request = {
+                              headers : oHeaders, // object that contains HTTP headers as name value pairs
+                              requestUri : sUrl, // OData endpoint URI
+                              method : "GET"
+                        };
+			OData.read(request,
+                                function (data) {
+				materialcat = new Object();
+				materialcat['red'] = new Array();
+				materialcat['yellow'] = new Array();
+				materialcat['green'] = new Array();
+				materialcat['black'] = new Array();
+				for (var i=0;i<data.results.length;i++){
+					material = new Object();
+					material['number'] = data.results[i].Material;
+					material['description'] = data.results[i].description;
+					material['buffer'] = data.results[i].reorderpoint;
+					material['bp'] = data.results[i].totalstockpoint;
+					material['stock'] = Math.round(material['buffer'] - (material['buffer']*material['bp']));
+					if(material['bp']<=0.33){
+						materialcat['green'].push(material);	
+					}else if(material['bp']<=0.66){
+						materialcat['yellow'].push(material);	
+					}else if(material['bp']<=0.99){
+						materialcat['red'].push(material);
+					}else {
+						materialcat['black'].push(material);
+					}
+				}
+				drawChart();
+				},function (err) {
+                                        alert(JSON.stringify(err));
+
+                                });
+                  }	
+
+
 		function getData(){
 				$('#workList').empty();
                                 $("#footertext").html("Checking");
@@ -120,6 +208,7 @@
 	</div><!-- /header -->
 
 	<div data-role="content">	
+		<div id="container" style="max-width: 410px; height: 300px; margin: 0 auto"></div>
 	</div><!-- /content -->
 	
 	<div data-role="footer" data-position="fixed" visible="false">
