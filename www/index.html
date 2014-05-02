@@ -24,7 +24,7 @@
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=medium-dpi" />
         <title>SAP Workflow POC</title>
         <script src="js/jquery-1.10.2.min.js"></script>
-        <script src="js/jquery.mobile-1.3.2.min.js"></script>
+        <script src="js/jquery.mobile-1.4.2.min.js"></script>
 	<script src="js/highcharts.js"></script>
 	<script>
 		var materialcat;
@@ -199,7 +199,8 @@
 			alert("hello");
          });
         </script>
-	<div data-role="page" id="main-page">
+	<div data-role="page" id="main-page" data-theme="a">
+
 
 	<div data-role="header">
 		<h1>Home Page</h1>
@@ -214,7 +215,7 @@
 	<div data-role="footer" data-position="fixed" visible="false">
 		<small id="status">&nbsp;</small> 
 	</div><!-- /footer -->
-	<div data-role="panel" id="panel-nav" class="jqm-nav-panel" data-position="left"  data-display="overlay"  data-theme="c" data-position-fixed="true">
+	<div data-role="panel" id="panel-nav" class="jqm-nav-panel" data-position="left"  data-display="overlay" data-position-fixed="true">
 	 <ul data-role="listview" data-inset="false" data-theme="d" data-divider-theme="d"  data-icon="false" class="jqm-list">
             <li><a href="#main-page">Home</a></li>
             <li><a href="#zp1-page">Workflow</a></li>
@@ -240,7 +241,7 @@
 	
 	</div><!-- /page -->
 	<!--------------------------------------------------------------------------------------------------------------->
-        <div data-role="page" id="zp1-page">
+        <div data-role="page" id="zp1-page" data-theme="a">
 
         <div data-role="header">
                 <h1>Work Items</h1>
@@ -257,7 +258,7 @@
         <div data-role="footer" data-position="fixed">
 		<small>&nbsp;</small>
         </div><!-- /footer -->
-        <div data-role="panel" id="panel-nav" class="jqm-nav-panel" data-position="left"  data-display="overlay"  data-theme="c" data-position-fixed="true">
+        <div data-role="panel" id="panel-nav" class="jqm-nav-panel" data-position="left"  data-display="overlay"  data-position-fixed="true">
          <ul data-role="listview" data-inset="false" data-theme="d" data-divider-theme="d"  data-icon="false" class="jqm-list">
             <li><a href="#main-page">Home</a></li>
             <li><a href="#zp1-page">Workflow</a></li>
@@ -274,7 +275,7 @@
             <input type="password" name="password" id="password" autocomplete="off" data-mini="true">
 
             <div class="ui-grid-a">
-                <div class="ui-block-a"><a href="#" data-rel="close" data-role="button" data-theme="c" data-mini="true">Cancel</a></div>
+                <div class="ui-block-a"><a href="#" data-rel="close" data-role="button" data-mini="true">Cancel</a></div>
                 <div class="ui-block-b"><a href="#" data-rel="close" data-role="button" data-theme="b" data-mini="true" onClick="saveUser()">Save</a></div>
             </div>
         </form>
@@ -286,7 +287,10 @@
 
         <script type="text/javascript" src="phonegap.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
-	<link rel="stylesheet"  href="css/jquery.mobile-1.3.2.min.css">
+	
+	<link rel="stylesheet" href="css/phani-workflow.min.css" />
+	<link rel="stylesheet" href="css/jquery.mobile.icons.min.css" />
+	<link rel="stylesheet"  href="css/jquery.mobile.structure-1.4.2.min.css">
         <script type="text/javascript" src="js/datajs-1.1.1.js"></script>
 
 
